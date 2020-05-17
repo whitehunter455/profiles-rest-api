@@ -11,7 +11,15 @@ from rest_framework.authentication import TokenAuthentication
 from profiles_api import permission
 #===== End Section 10.5 =====
 
+#Section 11 Add Authentication Token. Berkaitan dengan from rest_framework.authentication import TokenAuthentication
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.settings import api_settings
+#===== End Section 11 =====
+
 from rest_framework import filters
+
+#from rest_framework.permissions import IsAuthenticatedOrReadOnly #Unathenticated User can still see the feeed
+from rest_framework.permissions import IsAuthenticated
 
 class HelloApiView(APIView):
     """Test API View"""
@@ -124,3 +132,25 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     #Add Filter
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name', 'email',)
+
+
+class UserLoginApiView(ObtainAuthToken):
+   """Handle creating user authentication tokens"""
+   renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES #It adds the renderer classes to our obtain auth token view which will enable it in the Django admin the rest of the view sets
+
+
+class UserProfileFeedViewSet(viewsets.ModelViewSet):
+    """Handles creating, reading and updating profile feed items"""
+    authentication_classes = (TokenAuthentication,)
+    serializer_class = serializers.ProfileFeedItemSerializer
+    queryset = models.ProfileFeedItem.objects.all()
+
+    #get rid of the issue of users trying to create a new feed item when they're not authenticated
+    permission_classes = (
+        permission.UpdateOwnStatus, #to make sure user cant update/delete other user's feed
+        IsAuthenticated
+    )
+
+    def perform_create(self, serializer):
+        """Sets the user profile to the logged in user"""
+        serializer.save(user_profile=self.request.user)
