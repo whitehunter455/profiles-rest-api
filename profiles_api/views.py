@@ -11,6 +11,8 @@ from rest_framework.authentication import TokenAuthentication
 from profiles_api import permission
 #===== End Section 10.5 =====
 
+from rest_framework import filters
+
 class HelloApiView(APIView):
     """Test API View"""
     serializer_class = serializers.HelloSerializer
@@ -118,3 +120,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = models.UserProfile.objects.all() #perlu query set agar tahu Model yg di managed
     authentication_classes = (TokenAuthentication,)
     permission_classes = (permission.UpdateOwnProfile,)
+
+    #Add Filter
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name', 'email',)
