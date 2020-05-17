@@ -8,6 +8,9 @@ from rest_framework.routers import DefaultRouter
 #Created for ViewSet
 router = DefaultRouter()
 router.register('hello-viewset', views.HelloViewSet, base_name='hello-viewset')
+router.register('profile', views.UserProfileViewSet) #Tidak perlu base_name karena di ViewSet sudah ada query_set
+# if you provide the query set then Django rest framework can figure out the name from the model that's assigned
+
 #===========================
 
 urlpatterns = [

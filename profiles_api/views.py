@@ -4,6 +4,12 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from profiles_api import serializers
+from profiles_api import models
+
+#Section 10.5 Add Authentication dan permissions
+from rest_framework.authentication import TokenAuthentication
+from profiles_api import permission
+#===== End Section 10.5 =====
 
 class HelloApiView(APIView):
     """Test API View"""
@@ -104,3 +110,11 @@ class HelloViewSet(viewsets.ViewSet):
         """Handle removing an object"""
 
         return Response({'http_method': 'DELETE'})
+
+
+class UserProfileViewSet(viewsets.ModelViewSet):
+    """Handle creating, creating and updating profiles"""
+    serializer_class = serializers.UserProfileSerializer
+    queryset = models.UserProfile.objects.all() #perlu query set agar tahu Model yg di managed
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permission.UpdateOwnProfile,)
